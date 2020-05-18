@@ -1,0 +1,6 @@
+*~
+debian/.debhelper
+debian/l10n-cloud
+debian/*log
+debian/debhelper-build-stamp
+debian/files

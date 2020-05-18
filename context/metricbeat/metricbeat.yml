@@ -1,0 +1,137 @@
+metricbeat.config:
+  modules:
+    path: ${path.config}/modules.d/*.yml
+    # Reload module configs as they change:
+    reload.enabled: false
+
+metricbeat.autodiscover:
+  providers:
+    - type: docker
+      templates:
+        - condition:
+            contains.docker.container.image: mariadb
+          config:
+            - module: mysql
+              metricsets:
+                - "status"
+              #  - "galera_status"
+              period: 10s
+              hosts: ["${data.docker.container.labels.metrics_host}"]
+        - condition:
+            contains.docker.container.image: postgres
+          config:
+            - module: postgresql
+              enabled: true
+              metricsets:
+                - database
+                - bgwriter
+                - activity
+              period: 10s
+              hosts: ["${data.docker.container.labels.metrics_host}"]
+        - condition:
+            contains.docker.container.image: docker.elastic.co/elasticsearch/elasticsearch
+          config:
+            - module: elasticsearch
+              metricsets:
+                - node
+                # - node_stats
+                # - index
+                # - index_recovery
+                # - index_summary
+                - shard
+                #- ml_job
+              period: 10s
+              hosts: ["${data.docker.container.labels.metrics_host}"]
+        - condition:
+            contains.docker.container.image: nginx
+          config:
+            - module: nginx
+              metricsets: ["stubstatus"]
+              enable: true
+              period: 10s
+              hosts: ["${data.docker.container.labels.metrics_host}"]
+              server_status_path: "${data.docker.container.labels.metrics_status_path}"
+        - condition:
+            contains.docker.container.image: phlax/matomo
+          config:
+            - module: php_fpm
+              metricsets: ["pool"]
+              enabled: true
+              period: 10s
+              status_path: "${data.docker.container.labels.metrics_status_path}"
+              hosts: ["${data.docker.container.labels.metrics_host}"]
+        - condition:
+            contains.docker.container.image: docker.elastic.co/kibana/kibana
+          config:
+            - module: kibana
+              metricsets: ["status"]
+              period: 10s
+              hosts: ["${data.docker.container.labels.metrics_host}"]
+              basepath: ""
+              enabled: true
+        - condition:
+            contains.docker.container.image: envoy
+          config:
+            - module: envoyproxy
+              metricsets: ["server"]
+              period: 10s
+              hosts: ["${data.docker.container.labels.metrics_host}"]
+
+
+processors:
+  - drop_fields:
+      fields: ["docker.container.labels"]
+      ignore_missing: true
+
+
+metricbeat.modules:
+- module: docker
+  metricsets:
+    - "container"
+    - "cpu"
+    - "diskio"
+    - "event"
+    - "healthcheck"
+    - "info"
+    - "image"
+    - "memory"
+    - "network"
+  hosts: ["unix:///var/run/docker.sock"]
+  period: 10s
+  enabled: true
+- module: system
+  metricsets:
+    - cpu             # CPU usage
+    - load            # CPU load averages
+    - memory          # Memory usage
+    - network         # Network IO
+    - process         # Per process metrics
+    - process_summary # Process summary
+    - uptime          # System Uptime
+    - socket_summary  # Socket summary
+    - core           # Per CPU core usage
+    - diskio         # Disk IO
+    - filesystem     # File system usage for each mountpoint
+    - fsstat         # File system summary metrics
+    #- raid           # Raid
+    #- socket         # Sockets and connection info (linux only)
+    - service        # systemd service information
+  enabled: true
+  period: 10s
+  processes: ['.*']
+  process.cgroups.enabled: true
+
+  # Configure the metric types that are included by these metricsets.
+  cpu.metrics:  ["percentages","normalized_percentages"]  # The other available option is ticks.
+  core.metrics: ["percentages"]
+
+output.elasticsearch:
+  hosts: '${ELASTICSEARCH_HOSTS:elasticsearch:9200}'
+  username: '${ELASTICSEARCH_USERNAME:elastic}'
+  password: '${ELASTICSEARCH_PASSWORD:}'
+
+system.hostfs: /hostfs
+setup.template:
+  enabled: false
+  overwrite: false
+  fields: "/usr/share/metricbeat/fields.yml"

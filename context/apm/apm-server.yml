@@ -1,0 +1,7 @@
+apm-server:
+  host: "0.0.0.0:8200"
+  rum.enable: true
+output.elasticsearch:
+  hosts: ["elasticsearch:9200"]
+  username: '${ELASTICSEARCH_USERNAME:elastic}'
+  password: '${ELASTICSEARCH_PASSWORD:}'

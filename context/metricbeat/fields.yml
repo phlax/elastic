@@ -7204,6 +7204,11 @@
           '
         name: process_num
         type: long
+      - description: 'Number of threads.
+
+          '
+        name: threads
+        type: long
       - description: 'Process ID.
 
           '
@@ -7213,6 +7218,41 @@
         type: alias
       - description: ''
         name: run_queue
+        type: long
+      - description: 'Number of stopping jobs.
+
+          '
+        name: stopping
+        type: long
+      - description: 'Number of all jobs.
+
+          '
+        name: jobs
+        type: long
+      - description: 'Number of unstoppable jobs.
+
+          '
+        name: unstoppable_jobs
+        type: long
+      - description: 'Number of listeners.
+
+          '
+        name: listeners
+        type: long
+      - description: 'Number of dropped logs.
+
+          '
+        name: dropped_logs
+        type: long
+      - description: 'Number of busy polling.
+
+          '
+        name: busy_polling
+        type: long
+      - description: 'Number of failed resolutions.
+
+          '
+        name: failed_resolutions
         type: long
       - description: ''
         name: tasks
@@ -7229,6 +7269,53 @@
         format: bytes
         name: memory.max.bytes
         type: long
+      - fields:
+        - fields:
+          - description: 'Number of bytes sent out.
+
+              '
+            name: total
+            type: long
+          - description: 'Average bytes output rate.
+
+              '
+            name: rate
+            type: long
+          name: out
+          type: group
+        name: bytes
+        type: group
+      - fields:
+        - description: 'Number of active peers.
+
+            '
+          name: active
+          type: long
+        - description: 'Number of connected peers.
+
+            '
+          name: connected
+          type: long
+        name: peers
+        type: group
+      - fields:
+        - description: 'Size of the allocated pool.
+
+            '
+          name: allocated
+          type: long
+        - description: 'Number of members used from the allocated pool.
+
+            '
+          name: used
+          type: long
+        - description: 'Number of failed connections to pool members.
+
+            '
+          name: failed
+          type: long
+        name: pool
+        type: group
       - description: 'Maximum number of open files for the process.
 
           '
@@ -7470,6 +7557,17 @@
           '
         name: tracked.id
         type: long
+      - description: 'Cookie value of the server or the name of the cookie of the
+          backend.
+
+          '
+        name: cookie
+        type: keyword
+      - description: 'Load balancing algorithm.
+
+          '
+        name: load_balancing_algorithm
+        type: keyword
       - fields:
         - description: 'Cumulative number of connections.
 
@@ -7486,6 +7584,52 @@
             '
           name: time.avg
           type: long
+        - description: 'Number of connections over the last second.
+
+            '
+          name: rate
+          type: long
+        - description: 'Highest value of connection.rate.
+
+            '
+          name: rate_max
+          type: long
+        - description: 'Number of connection establishment attempts.
+
+            '
+          name: attempt.total
+          type: long
+        - description: 'Number of connection reuses.
+
+            '
+          name: reuse.total
+          type: long
+        - fields:
+          - description: 'Number of idle connections available for reuse.
+
+              '
+            name: total
+            type: long
+          - description: 'Limit on idle connections available for reuse.
+
+              '
+            name: limit
+            type: long
+          name: idle
+          type: group
+        - fields:
+          - description: 'Number of cache lookups.
+
+              '
+            name: lookup.total
+            type: long
+          - description: 'Number of cache hits.
+
+              '
+            name: hits
+            type: long
+          name: cache
+          type: group
         name: connection
         type: group
       - fields:
@@ -7493,6 +7637,16 @@
             \ this is because of a matched tcp-request content rule.\n  * For HTTP\
             \ this is because of a matched http-request or tarpit rule.\n"
           name: denied
+          type: long
+        - description: 'Requests denied because of TCP request connection rules.
+
+            '
+          name: denied_by_connection_rules
+          type: long
+        - description: 'Requests denied because of TCP request session rules.
+
+            '
+          name: denied_by_session_rules
           type: long
         - description: 'Current queued requests. For backends, this field reports
             the number of requests queued without a server assigned.
@@ -7545,6 +7699,11 @@
 
             '
           name: total
+          type: long
+        - description: 'Number of intercepted requests.
+
+            '
+          name: intercepted
           type: long
         name: request
         type: group
@@ -7608,6 +7767,20 @@
         name: response
         type: group
       - fields:
+        - fields:
+          - fields:
+            - description: 'Number of failed header rewrite warnings.
+
+                '
+              name: total
+              type: long
+            name: failed
+            type: group
+          name: rewrite
+          type: group
+        name: header
+        type: group
+      - fields:
         - description: 'Number of current sessions.
 
             '
@@ -7622,6 +7795,11 @@
 
             '
           name: limit
+          type: long
+        - description: 'Number of all sessions.
+
+            '
+          name: total
           type: long
         - fields:
           - description: 'Number of sessions per second over the last elapsed second.
@@ -7768,6 +7946,11 @@
             '
           name: name
           type: keyword
+        - description: 'Proxy mode (tcp, http, health, unknown).
+
+            '
+          name: mode
+          type: keyword
         name: proxy
         type: group
       - description: ''
@@ -7784,6 +7967,80 @@
           name: time.avg
           type: integer
         name: queue
+        type: group
+      - description: ''
+        fields:
+        - description: "Status of the last health check. One of:\n\n  UNK     -> unknown\n\
+            \  INI     -> initializing\n  SOCKERR -> socket error\n  L4OK    -> check\
+            \ passed on layer 4, no upper layers enabled\n  L4TOUT  -> layer 1-4 timeout\n\
+            \  L4CON   -> layer 1-4 connection problem, for example\n            \"\
+            Connection refused\" (tcp rst) or \"No route to host\" (icmp)\n  L7OK\
+            \    -> agent reported \"up\"\n  L7STS   -> agent reported \"fail\", \"\
+            stop\" or \"down\"\n"
+          name: status
+          type: keyword
+        - description: 'Human readable version of agent.status.
+
+            '
+          name: description
+          type: keyword
+        - description: 'Value reported by agent.
+
+            '
+          name: code
+          type: integer
+        - description: 'Rise value of agent.
+
+            '
+          name: rise
+          type: integer
+        - description: 'Fall value of agent.
+
+            '
+          name: fall
+          type: integer
+        - description: 'Health parameter of agent. Between 0 and `agent.rise`+`agent.fall`-1.
+
+            '
+          name: health
+          type: integer
+        - description: 'Duration of the last check in ms.
+
+            '
+          name: duration
+          type: integer
+        - fields:
+          - description: 'Rise value of server.
+
+              '
+            name: rise
+            type: integer
+          - description: 'Fall value of server.
+
+              '
+            name: fall
+            type: integer
+          - description: 'Health parameter of server. Between 0 and `agent.check.rise`+`agent.check.fall`-1.
+
+              '
+            name: health
+            type: integer
+          - description: 'Human readable version of check.
+
+              '
+            name: description
+            type: keyword
+          name: check
+          type: group
+        name: agent
+        type: group
+      - fields:
+        - description: 'Address of the source.
+
+            '
+          name: address
+          type: text
+        name: source
         type: group
       name: stat
       release: ga
@@ -8103,9 +8360,7 @@
             '
           name: ignore
           type: long
-        - description: 'Number of entries where list insert insert failed
-
-            '
+        - description: "Number of entries where list insert insert failed \n"
           name: insert_failed
           type: long
         - description: 'packets seen that cannot be tracked
@@ -8861,9 +9116,8 @@
               '
             name: key
             type: long
-          - description: 'The number of requests to read the last key in an index.
-
-              '
+          - description: "The number of requests to read the last key in an index.\
+              \ \n"
             name: last
             type: long
           - description: 'The number of requests to read the next row in key order.
@@ -8876,15 +9130,12 @@
               '
             name: prev
             type: long
-          - description: 'The number of requests to read a row based on a fixed position.
-
-              '
+          - description: "The number of requests to read a row based on a fixed position.\
+              \ \n"
             name: rnd
             type: long
-          - description: 'The number of requests to read the next row in the data
-              file.
-
-              '
+          - description: "The number of requests to read the next row in the data\
+              \ file. \n"
             name: rnd_next
             type: long
           name: read
@@ -8939,10 +9190,8 @@
             type: long
           - description: ''
             fields:
-            - description: 'The total number of bytes in the InnoDB buffer pool containing
-                data.
-
-                '
+            - description: "The total number of bytes in the InnoDB buffer pool containing\
+                \ data. \n"
               name: data
               type: long
             - description: 'The total current number of bytes held in dirty pages
@@ -10102,15 +10351,11 @@
           format: bytes
           name: used.peak
           type: long
-        - description: 'Used memory by the Lua engine.
-
-            '
+        - description: "Used memory by the Lua engine.        \n"
           format: bytes
           name: used.lua
           type: long
-        - description: 'The size in bytes of the dataset
-
-            '
+        - description: "The size in bytes of the dataset \n"
           format: bytes
           name: used.dataset
           type: long
@@ -10236,10 +10481,8 @@
             format: duration
             name: bgsave.current_time.sec
             type: long
-          - description: 'The size in bytes of copy-on-write allocations during the
-              last RBD save operation
-
-              '
+          - description: "The size in bytes of copy-on-write allocations during the\
+              \ last RBD save operation                \n"
             format: bytes
             name: copy_on_write.last_size
             type: long
@@ -10306,9 +10549,7 @@
             format: bytes
             name: buffer.size
             type: long
-          - description: 'AOF current file size
-
-              '
+          - description: "AOF current file size             \n"
             format: bytes
             name: size.current
             type: long
@@ -10363,9 +10604,8 @@
           format: bytes
           name: backlog.size
           type: long
-        - description: 'The master offset of the replication backlog buffer
-
-            '
+        - description: "The master offset of the replication backlog buffer      \
+            \    \n"
           name: backlog.first_byte_offset
           type: long
         - description: 'Size in bytes of the data in the replication backlog buffer
@@ -11323,7 +11563,7 @@
           name: used.bytes
           type: long
         - description: 'Actual free memory in bytes. It is calculated based on the
-            OS. On Linux this value will be MemAvailable from /proc/meminfo, or calculated
+            OS. On Linux this value will be MemAvailable from /proc/meminfo,  or calculated
             from free memory plus caches and buffers if /proc/meminfo is not available.
             On OSX it is a sum of free memory and the inactive memory. On Windows,
             it is equal to `system.memory.free`.
@@ -12148,9 +12388,7 @@
           '
         name: level
         type: keyword
-      - description: 'Current sync action, if the RAID array is redundant
-
-          '
+      - description: "Current sync action, if the RAID array is redundant \n"
         name: sync_action
         type: keyword
       - description: 'Number of active disks.
@@ -12359,11 +12597,9 @@
 
           '
         fields:
-        - description: 'Memory used by TCP sockets in bytes, based on number of allocated
-            pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/tcp_mem.
-            Only available on Linux.
-
-            '
+        - description: "Memory used by TCP sockets in bytes, based on number of allocated\
+            \ pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/tcp_mem.\
+            \ Only available on Linux. \n"
           format: bytes
           name: memory
           type: integer
@@ -12409,11 +12645,9 @@
 
           '
         fields:
-        - description: 'Memory used by UDP sockets in bytes, based on number of allocated
-            pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/udp_mem.
-            Only available on Linux.
-
-            '
+        - description: "Memory used by UDP sockets in bytes, based on number of allocated\
+            \ pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/udp_mem.\
+            \ Only available on Linux. \n"
           format: bytes
           name: memory
           type: integer

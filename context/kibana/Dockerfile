@@ -1,5 +1,5 @@
 
-ARG BUILD_FROM=docker.elastic.co/kibana/kibana:7.8.0-SNAPSHOT
+ARG BUILD_FROM=docker.elastic.co/kibana/kibana:7.9.0-SNAPSHOT
 
 FROM $BUILD_FROM
 

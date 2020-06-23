@@ -12,6 +12,7 @@ metricbeat.autodiscover:
             contains.docker.container.image: mariadb
           config:
             - module: mysql
+              enabled: true
               metricsets:
                 - "status"
               #  - "galera_status"
@@ -34,11 +35,11 @@ metricbeat.autodiscover:
             - module: elasticsearch
               metricsets:
                 - node
-                # - node_stats
+                - node_stats
                 # - index
                 # - index_recovery
                 # - index_summary
-                - shard
+                # - shard
                 #- ml_job
               period: 10s
               hosts: ["${data.docker.container.labels.metrics_host}"]
@@ -61,7 +62,15 @@ metricbeat.autodiscover:
               status_path: "${data.docker.container.labels.metrics_status_path}"
               hosts: ["${data.docker.container.labels.metrics_host}"]
         - condition:
-            contains.docker.container.image: docker.elastic.co/kibana/kibana
+            contains.docker.container.image: envoy
+          config:
+            - module: envoyproxy
+              enabled: true
+              metricsets: ["server"]
+              period: 10s
+              hosts: ["${data.docker.container.labels.metrics_host}"]
+        - condition:
+            contains.docker.container.image: phlax/kibana
           config:
             - module: kibana
               metricsets: ["status"]
@@ -70,19 +79,50 @@ metricbeat.autodiscover:
               basepath: ""
               enabled: true
         - condition:
-            contains.docker.container.image: envoy
+            contains.docker.container.image: phlax/filebeat
           config:
-            - module: envoyproxy
-              metricsets: ["server"]
+            - module: beat
+              metricsets:
+                - stats
+                - state
               period: 10s
               hosts: ["${data.docker.container.labels.metrics_host}"]
+              enabled: true
+        - condition:
+            contains.docker.container.image: phlax/metricbeat
+          config:
+            - module: beat
+              metricsets:
+                - stats
+                - state
+              period: 10s
+              hosts: ["${data.docker.container.labels.metrics_host}"]
+              enabled: true
+        - condition:
+            contains.docker.container.image: phlax/apm
+          config:
+            - module: beat
+              metricsets:
+                - stats
+                - state
+              period: 10s
+              hosts: ["${data.docker.container.labels.metrics_host}"]
+              enabled: true
 
 
 processors:
   - drop_fields:
-      fields: ["docker.container.labels"]
+      fields: ["docker.container.labels", "docker.image.labels"]
       ignore_missing: true
-
+  # there seems to be a bug that leaves nsfs mounts, wierdly
+  - drop_event.when.regexp:
+      system.filesystem.mount_point: '^/hostfs/run/'
+  # there seems to be a bug with system.network.filtering
+  - drop_event.when.regexp:
+      system.network.name: '^(br-|veth)'
+  # theres no way to do negative matching on system/service.pattern_filter
+  - drop_event.when.regexp:
+      system.service.name: '^(getty|systemd)-'
 
 metricbeat.modules:
 - module: docker
@@ -90,10 +130,10 @@ metricbeat.modules:
     - "container"
     - "cpu"
     - "diskio"
-    - "event"
+    # - "event"
     - "healthcheck"
     - "info"
-    - "image"
+    # - "image"
     - "memory"
     - "network"
   hosts: ["unix:///var/run/docker.sock"]
@@ -120,6 +160,39 @@ metricbeat.modules:
   period: 10s
   processes: ['.*']
   process.cgroups.enabled: true
+  interfaces:
+    - lo
+    - eth0
+    - docker0
+  filesystem.ignore_types:
+    - autofs
+    - binfmt_misc
+    - bpf
+    - cgroup
+    - cgroup2
+    - debugfs
+    - devpts
+    - devtmpfs
+    - fusectl
+    - fuse.lxcfs
+    - hostfs
+    - hugetlbfs
+    - lxcfs
+    - mqueue
+    - nfs
+    - nfs4
+    - nsfs
+    - overlay
+    - proc
+    - pstore
+    - rpc_pipefs
+    - securityfs
+    - shm
+    - sysfs
+    - systemd-1
+    - tmpfs
+    - tracefs
+    - udev
 
   # Configure the metric types that are included by these metricsets.
   cpu.metrics:  ["percentages","normalized_percentages"]  # The other available option is ticks.
@@ -132,6 +205,9 @@ output.elasticsearch:
 
 system.hostfs: /hostfs
 setup.template:
-  enabled: false
+  enabled: true
   overwrite: true
   fields: "/usr/share/metricbeat/fields.yml"
+http:
+  enabled: true
+  host: unix:///var/run/sockets/metricbeat.sock

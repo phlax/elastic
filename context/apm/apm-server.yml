@@ -5,3 +5,7 @@ output.elasticsearch:
   hosts: ["elasticsearch:9200"]
   username: '${ELASTICSEARCH_USERNAME:elastic}'
   password: '${ELASTICSEARCH_PASSWORD:}'
+http:
+  enabled: true
+  host: unix:///var/run/sockets/status/apm-server.sock
+monitoring.enabled: false

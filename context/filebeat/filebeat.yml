@@ -88,3 +88,7 @@ setup.template:
   enabled: true
   overwrite: true
   fields: "/usr/share/filebeat/fields.yml"
+
+http:
+  enabled: true
+  host: unix:///var/run/sockets/filebeat.sock

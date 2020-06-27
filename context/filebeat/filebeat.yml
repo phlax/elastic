@@ -85,7 +85,7 @@ output.elasticsearch:
 
 strict.perms: false
 setup.template:
-  enabled: true
+  enabled: false
   overwrite: true
   fields: "/usr/share/filebeat/fields.yml"
 

@@ -205,7 +205,7 @@ output.elasticsearch:
 
 system.hostfs: /hostfs
 setup.template:
-  enabled: true
+  enabled: false
   overwrite: true
   fields: "/usr/share/metricbeat/fields.yml"
 http:

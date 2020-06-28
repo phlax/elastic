@@ -108,6 +108,16 @@ metricbeat.autodiscover:
               period: 10s
               hosts: ["${data.docker.container.labels.metrics_host}"]
               enabled: true
+        - condition:
+            contains.docker.container.image: redis
+          config:
+            - module: redis
+              metricsets:
+                - info
+                - keyspace
+              period: 10s
+              hosts: ["${data.docker.container.labels.metrics_host}"]
+              enabled: true
 
 
 processors:

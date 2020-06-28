@@ -116,6 +116,7 @@ metricbeat.autodiscover:
                 - info
                 - keyspace
               period: 10s
+              network: unix
               hosts: ["${data.docker.container.labels.metrics_host}"]
               enabled: true
 

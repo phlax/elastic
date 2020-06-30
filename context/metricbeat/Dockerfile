@@ -1,5 +1,5 @@
 
-ARG BUILD_FROM=docker.elastic.co/beats/metricbeat:7.9.0-SNAPSHOT
+ARG BUILD_FROM=docker.elastic.co/beats/metricbeat-oss:7.9.0-SNAPSHOT
 
 FROM $BUILD_FROM
 

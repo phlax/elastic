@@ -8,7 +8,7 @@ filebeat-image:
 	sudo mkdir -p /var/lib/beatbox/src/github.com/elastic
 	sudo chown -R travis /var/lib/beatbox
 	cd /var/lib/beatbox/src/github.com/elastic \
-		&& git clone https://github.com/elastic/beats \
+		&& if [ ! -d beats ]; then git clone https://github.com/elastic/beats; fi \
 		&& cd beats \
 		&& git checkout $$BEATS_BRANCH
 	docker run --rm \
@@ -33,7 +33,7 @@ metricbeat-image:
 	sudo mkdir -p /var/lib/beatbox/src/github.com/elastic
 	sudo chown -R travis /var/lib/beatbox
 	cd /var/lib/beatbox/src/github.com/elastic \
-		&& git clone https://github.com/elastic/beats \
+		&& if [ ! -d beats ]; then git clone https://github.com/elastic/beats; fi \
 		&& cd beats \
 		&& git checkout $$BEATS_BRANCH
 	docker run --rm \
